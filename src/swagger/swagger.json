@@ -1,0 +1,576 @@
+{
+	"swagger": "2.0",
+	"info": {
+	  "description": "Definition of Oauth server APIs",
+	  "version": "1.0.0",
+	  "title": "Swagger OAuth server",
+	  "contact": {
+		"email": "pascal.limeux@orange.com"
+	  },
+	  "license": {
+		"name": "Apache 2.0",
+		"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+	  }
+	},
+
+	"basePath": "/oauth/api/v1.0.0",
+	"tags": [
+	  {
+		"name": "signin",
+		"description": "Get access token for a user"
+		},
+	  {
+		"name": "users",
+		"description": "Access to Application users"
+		}
+
+	],
+	"schemes": [
+	  "http",
+	  "https"
+	],
+        
+	"paths": {
+	  "/auth/sign_in": {
+			"post": {
+				"tags": [
+				"signin"
+				],
+				"summary": "Sign in as a user",
+				"description": "",
+				"operationId": "signinUser",
+				"consumes": [
+				  "application/json"
+				],
+				"produces": [
+				  "application/json"
+				],
+				"parameters": [
+				 {
+					 "in": "body",
+					 "name": "body",
+					 "description": "Sign in to get access token",
+					 "required": true,
+					 "schema": {
+					   "$ref": "#/definitions/Signin"
+				 	 }
+				 }
+				],
+				"responses": {
+				"200": {
+						"description": "successful operation",
+						"schema": {
+						"$ref": "#/definitions/UserSignIn"
+			     	}
+		   	},
+				"401": {
+					"description": "Unauthorized"
+				}
+			}
+		}
+	     },
+
+		"/users": {
+		"post": {
+		  "tags": [
+			"users"
+		  ],
+		  "summary": "Register a new user",
+		  "description": "This can only be done by an administrator.",
+		  "operationId": "addUser",
+		  "consumes": [
+			"application/json"
+		  ],
+		  "produces": [
+			"application/json"
+		  ],
+		  "parameters": [
+			{
+				"name": "provider",
+				"in": "query",
+				"description": "provider value that needs to be considered for account allocation",
+				"required": true,
+				"type": "array",
+				"items": {
+				"type": "string",
+				"enum": [
+				"http://172.18.0.4:22002",
+				"http://new-node-2:22003",
+				"http://new-node-3:22004",
+				"http://new-node-4:22005",
+				"http://new-node-5:22006",
+				"http://new-node-6:22007",
+				"http://new-node-7:22008"
+
+
+				],
+				"default": "http://new-node-1:22002"
+				},
+				"collectionFormat": "multi"
+				},
+			{
+			  "in": "body",
+			  "name": "body",
+			  "description": "User object that needs to be added to the application",
+			  "required": true,
+			  "schema": {
+				"$ref": "#/definitions/User"
+			  }
+			}
+		  ],
+		  "responses": {
+				"200": {
+					"description": "successful operation",
+					"schema": {
+					"$ref": "#/definitions/UserDetails"
+					}
+				},
+			  "401": {
+			    "description": "unhautorized"
+			  }
+		  },
+			"security": [
+				{
+				  "APIKeyHeader": []
+				}
+			]
+		},
+
+		"get": {
+			  "tags": [
+				"users"
+			  ],
+			  "summary": "Returns list of users",
+			  "description": "Returns a map of users",
+			  "operationId": "getUsers",
+			  "produces": [
+				"application/json"
+			  ],
+			  "parameters": [],
+			  "responses": {
+					"200" : {
+						"description" : "successful operation",
+						"schema" : {
+								"type" : "array",
+								"items" : {
+										"$ref" : "#/definitions/UserList"
+								}
+						}
+					},
+					"401": {
+						"description": "unhautorized"
+					}
+				},
+				"security": [
+					{
+						"APIKeyHeader": []
+					}
+				]
+		}
+		},
+
+	  "/users/{userId}": {
+		"get": {
+		  "tags": [
+			  "users"
+		  ],
+		  "summary": "Find user by ID",
+		  "description": "Returns a single user",
+		  "operationId": "getUserById",
+		  "produces": [
+			"application/json"
+		  ],
+		  "parameters": [
+			{
+			  "name": "userId",
+			  "in": "path",
+			  "description": "ID of user to return",
+			  "required": true,
+			  "type": "string"
+			}
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "successful operation",
+			  "schema": {
+				"$ref": "#/definitions/UserDetails"
+			  }
+			},
+			"401": {
+			  "description": "Unhautorized"
+			}
+		  },
+		  "security": [
+			  {
+			   "APIKeyHeader": []
+			  }
+		  ]
+		},
+
+		"put": {
+				"tags": [
+				"users"
+				],
+				"summary": "Update an existing user",
+				"description": "",
+				"operationId": "updateUser",
+				"consumes": [
+				"application/json"
+				],
+				"produces": [
+				"application/json"
+				],
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"description": "ID of user to update",
+						"required": true,
+						"type": "string"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "User object that needs to be added to the application",
+						"required": true,
+						"schema": {
+						"$ref": "#/definitions/UserUpdate"
+					}
+				}
+				],
+				"responses": {
+				"401": {
+					"description": "Unhautorized"
+				}
+				},
+				"security": [
+					{
+						"APIKeyHeader": []
+					}
+				]
+			},
+			"delete": {
+				"tags": [
+				"users"
+				],
+				"summary": "Delete user",
+				"description": "This can only be done by an administrator.",
+				"operationId": "deleteUser",
+				"produces": [
+				"application/json"
+				],
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"description": "ID of user to delete",
+						"required": true,
+						"type": "string"
+					}
+					],
+				"responses": {
+				"401": {
+					"description": "Unauthorized"
+				       }
+				},
+				"security": [
+				{
+				  "APIKeyHeader": []
+				}
+			]
+                                 
+			}
+		},
+	  "/users/getUserByEmail/{userEmail}": {
+			"get": {
+			  "tags": [
+				  "users"
+			  ],
+			  "summary": "Get user by Email",
+			  "description": "Returns a single user",
+			  "operationId": "getUserByEmail",
+			  "produces": [
+				"application/json"
+			  ],
+			  "parameters": [
+				{
+					"name": "userEmail",
+					"in": "path",
+					"description": "Email of user to return",
+					"required": true,
+					"type": "string"
+				  }
+			  ],
+			  "responses": {
+				"200": {
+				  "description": "successful operation",
+				  "schema": {
+					"$ref": "#/definitions/UserDetails"
+				  }
+				},
+				"401": {
+				  "description": "Unhautorized"
+				}
+			  },
+			  "security": [
+				  {
+				   "APIKeyHeader": []
+				  }
+			  ]
+			}
+	  },
+
+	  "/users/getUserByUserName/{userName}": {
+		"get": {
+		  "tags": [
+			  "users"
+		  ],
+		  "summary": "Get user by UserName",
+		  "description": "Returns a single user",
+		  "operationId": "getUserByUserName",
+		  "produces": [
+			"application/json"
+		  ],
+		  "parameters": [
+			{
+				"name": "userName",
+				"in": "path",
+				"description": "UserName of user to return",
+				"required": true,
+				"type": "array"
+			  }
+		  ],
+		  "responses": {
+			"200": {
+			  "description": "successful operation",
+			  "schema": {
+				"$ref": "#/definitions/UserDetails"
+			  }
+			},
+			"401": {
+			  "description": "Unhautorized"
+			}
+		  },
+		  "security": [
+			  {
+			   "APIKeyHeader": []
+			  }
+		  ]
+		}
+  }
+	},
+         
+
+        
+         
+
+ 
+	"securityDefinitions": {
+		"APIKeyHeader": {
+		"type": "apiKey",
+		"in": "header",
+		"name": "Authorization"
+		}
+	},
+
+	"definitions": {
+		"Signin": {
+			"type":"object",
+			"properties": {
+				"userName": {
+					"type" : "string",
+					"admin": "admin1"
+				},
+				"password": {
+					"type": "string",
+					"admin":"PassWord007"
+				}
+			}
+		},
+	  "User": {
+		"type": "object",
+		"properties": {
+		  "userName": {
+				"type": "string",
+				"required":"true"
+			},
+		  "firstName": {
+				"type": "string",
+				"required":"true"
+			},
+		  "lastName": {
+				"type": "string",
+				"required":"true"
+			},
+                   "roleOfUser": {
+			"type": "string",
+                        "required": "true"
+			},
+		  "email": {
+			  "type": "string",
+				"required":"true"
+		  },
+		  "password": {
+			  "type": "string",
+				"required":"true",
+				"description":"min length of 6 characters"
+			}
+		},
+		"xml": {
+		  "name": "User"
+		}
+		},
+	  "UserUpdate": {
+		"type": "object",
+		"properties": {
+                  "userName": {
+				"type": "string",
+				"required":"true"
+			},
+		  "firstName": {
+				"type": "string",
+				"required":"true"
+			},
+		"lastName": {
+				"type": "string",
+				"required":"true"
+			},
+                 "roleOfUser": {
+				"type": "string",
+				"required":"true"
+			},
+                  "email": {
+				"type": "string",
+				"required":"true"
+			},
+		  "password": {
+			  "type": "string",
+				"required":"true",
+				"description":"min length of 6 characters"
+			},
+                  "provider": {
+			"type": "string",
+                        "description":"example: http://new-node-1:22002"
+				},
+		   "account": {
+			"type": "string"
+				}
+		},
+		"xml": {
+		  "name": "UserUpdate"
+		}
+		},
+		"UserDetails": {
+			"type": "object",
+			"properties": {
+				"_id": {
+					"type": "string"
+				},
+				"userName": {
+					"type": "string"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+                                 "roleOfUser": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"provider": {
+					"type": "string"
+				},
+				"account": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			},
+			"xml": {
+				"name": "User"
+			}
+		},
+		"UserList": {
+			"type": "object",
+			"properties": {
+				"_id": {
+					"type": "string"
+				},
+				"userName": {
+					"type": "string"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+                                "roleOfUser": {
+				        "type": "string"
+			         },
+				"email": {
+					"type": "string"
+				},
+                                "provider": {
+					"type": "string"
+				},
+				"account": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				}
+			},
+			"xml": {
+				"name": "User"
+			}
+		},
+		"UserSignIn": {
+			"type": "object",
+			"properties": {
+				"_id": {
+					"type": "string"
+				},
+				"userName": {
+					"type": "string"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"updatedAt": {
+					"type": "string"
+				},
+				"accessToken": {
+					"type": "string"
+				},
+				"CRSToken": {
+					"type": "string"
+				}
+			},
+			"xml": {
+				"name": "User"
+			}
+		}
+	}
+	}
+	
